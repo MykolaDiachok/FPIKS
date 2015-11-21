@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <ConnectionString>Data Source=focus2;Initial Catalog=FPWork;MultipleActiveResultSets=True;User Id=sa;Password=1CGhtlghbznbt82;MultipleActiveResultSets=true;</ConnectionString>
+</root>

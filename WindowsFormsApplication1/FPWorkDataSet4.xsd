@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="FPWorkDataSet4" targetNamespace="http://tempuri.org/FPWorkDataSet4.xsd" xmlns:mstns="http://tempuri.org/FPWorkDataSet4.xsd" xmlns="http://tempuri.org/FPWorkDataSet4.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="FPWorkConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="FPWorkConnectionString1 (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.WindowsFormsApplication1.Properties.Settings.GlobalReference.Default.FPWorkConnectionString1" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="OperationsTableAdapter" GeneratorDataComponentClassName="OperationsTableAdapter" Name="Operations" UserDataComponentName="OperationsTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="FPWorkConnectionString1 (Settings)" DbObjectName="FPWork.dbo.Operations" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT DateTime, FPNumber, Operation, Closed, Error, ByteStatus, ByteResult FROM dbo.Operations
+where Closed=0 and Operation=3
+order by DateTime,  FPNumber</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="DateTime" DataSetColumn="DateTime" />
+              <Mapping SourceColumn="FPNumber" DataSetColumn="FPNumber" />
+              <Mapping SourceColumn="Operation" DataSetColumn="Operation" />
+              <Mapping SourceColumn="Closed" DataSetColumn="Closed" />
+              <Mapping SourceColumn="Error" DataSetColumn="Error" />
+              <Mapping SourceColumn="ByteStatus" DataSetColumn="ByteStatus" />
+              <Mapping SourceColumn="ByteResult" DataSetColumn="ByteResult" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="FPWorkDataSet4" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="FPWorkDataSet4" msprop:Generator_UserDSName="FPWorkDataSet4">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Operations" msprop:Generator_TableClassName="OperationsDataTable" msprop:Generator_TableVarName="tableOperations" msprop:Generator_TablePropName="Operations" msprop:Generator_RowDeletingName="OperationsRowDeleting" msprop:Generator_UserTableName="Operations" msprop:Generator_RowChangingName="OperationsRowChanging" msprop:Generator_RowEvHandlerName="OperationsRowChangeEventHandler" msprop:Generator_RowDeletedName="OperationsRowDeleted" msprop:Generator_RowEvArgName="OperationsRowChangeEvent" msprop:Generator_RowChangedName="OperationsRowChanged" msprop:Generator_RowClassName="OperationsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DateTime" msprop:Generator_ColumnVarNameInTable="columnDateTime" msprop:Generator_ColumnPropNameInRow="DateTime" msprop:Generator_ColumnPropNameInTable="DateTimeColumn" msprop:Generator_UserColumnName="DateTime" type="xs:long" />
+              <xs:element name="FPNumber" msprop:Generator_ColumnVarNameInTable="columnFPNumber" msprop:Generator_ColumnPropNameInRow="FPNumber" msprop:Generator_ColumnPropNameInTable="FPNumberColumn" msprop:Generator_UserColumnName="FPNumber" type="xs:int" />
+              <xs:element name="Operation" msprop:Generator_ColumnVarNameInTable="columnOperation" msprop:Generator_ColumnPropNameInRow="Operation" msprop:Generator_ColumnPropNameInTable="OperationColumn" msprop:Generator_UserColumnName="Operation" type="xs:int" />
+              <xs:element name="Closed" msprop:Generator_ColumnVarNameInTable="columnClosed" msprop:Generator_ColumnPropNameInRow="Closed" msprop:Generator_ColumnPropNameInTable="ClosedColumn" msprop:Generator_UserColumnName="Closed" type="xs:boolean" />
+              <xs:element name="Error" msprop:Generator_ColumnVarNameInTable="columnError" msprop:Generator_ColumnPropNameInRow="Error" msprop:Generator_ColumnPropNameInTable="ErrorColumn" msprop:Generator_UserColumnName="Error" type="xs:boolean" minOccurs="0" />
+              <xs:element name="ByteStatus" msprop:Generator_ColumnVarNameInTable="columnByteStatus" msprop:Generator_ColumnPropNameInRow="ByteStatus" msprop:Generator_ColumnPropNameInTable="ByteStatusColumn" msprop:Generator_UserColumnName="ByteStatus" type="xs:int" minOccurs="0" />
+              <xs:element name="ByteResult" msprop:Generator_ColumnVarNameInTable="columnByteResult" msprop:Generator_ColumnPropNameInRow="ByteResult" msprop:Generator_ColumnPropNameInTable="ByteResultColumn" msprop:Generator_UserColumnName="ByteResult" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:Operations" />
+      <xs:field xpath="mstns:DateTime" />
+      <xs:field xpath="mstns:FPNumber" />
+      <xs:field xpath="mstns:Operation" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

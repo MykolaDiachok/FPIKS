@@ -48,6 +48,8 @@ namespace FPIKS
             return cs - 1;
         }
 
+      
+
         byte getchecksum(List<byte> buf)
         {
             int i, n;
@@ -199,8 +201,141 @@ namespace FPIKS
         }
 
         #endregion
+        #region CRC16
 
+        static byte[] returnWithOutDublicateETX(byte[] source)
+        {
+            return returnWithOutDublicate(source, new byte[] { DLE, DLE });
+        }
 
+        static byte[] returnWithOutDublicate(byte[] source, byte[] pattern)
+        {
+
+            List<byte> tReturn = new List<byte>();
+            int sLenght = source.Length;
+            for (int i = 0; i < sLenght; i++)
+            {
+                if (source.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
+                {
+                    tReturn.Add(source[i]);
+                    i++;
+                }
+                else
+                {
+                    tReturn.Add(source[i]);
+                }
+            }
+            return (byte[])tReturn.ToArray();
+        }
+
+        static int? PatternAt(byte[] source, byte[] pattern)
+        {
+            for (int i = 0; i < source.Length; i++)
+            {
+                if (source.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
+                {
+                    return i;
+                }
+            }
+            return null;
+        }
+
+        static string PrintByteArray(byte[] bytes)
+        {
+            var sb = new StringBuilder("new byte[] { ");
+            foreach (var b in bytes)
+            {
+                sb.AppendFormat("{0:x2}", b);
+                sb.Append(" ");
+            }
+            sb.Append("}");
+            return sb.ToString();
+        }
+
+        ///
+
+        public enum Crc16Mode : ushort { Standard = 0xA001, CcittKermit = 0x8408 }
+
+        public class Crc16
+        {
+            static ushort[] table = new ushort[256];
+
+            public ushort ComputeChecksum(params byte[] bytes)
+            {
+                ushort crc = 0;
+                for (int i = 0; i < bytes.Length; ++i)
+                {
+                    byte index = (byte)(crc ^ bytes[i]);
+                    crc = (ushort)((crc >> 8) ^ table[index]);
+                }
+                return crc;
+            }
+
+            public byte[] ComputeChecksumBytes(params byte[] bytes)
+            {
+                ushort crc = ComputeChecksum(bytes);
+                return BitConverter.GetBytes(crc);
+            }
+
+            public Crc16(Crc16Mode mode)
+            {
+                ushort polynomial = (ushort)mode;
+                ushort value;
+                ushort temp;
+                for (ushort i = 0; i < table.Length; ++i)
+                {
+                    value = 0;
+                    temp = i;
+                    for (byte j = 0; j < 8; ++j)
+                    {
+                        if (((value ^ temp) & 0x0001) != 0)
+                        {
+                            value = (ushort)((value >> 1) ^ polynomial);
+                        }
+                        else
+                        {
+                            value >>= 1;
+                        }
+                        temp >>= 1;
+                    }
+                    table[i] = value;
+                }
+            }
+        }
+
+        public byte[] returnArrayBytesWithCRC16(byte[] inBytes)
+        {
+            Crc16 crc = new Crc16(Crc16Mode.CcittKermit);
+            byte[] bytebegin = { DLE, STX };
+            byte[] byteend = { DLE, ETX };
+
+            byte[] tempb = returnWithOutDublicateETX(inBytes);
+            var searchBegin = PatternAt(tempb, bytebegin);
+            if (searchBegin == null)
+                return null;
+
+            var searchEnd = PatternAt(tempb, byteend);
+            if (searchEnd == null)
+                return null;
+
+            var newArr = tempb.Skip((int)searchBegin + 2).Take((int)searchEnd - 2).ToArray();
+
+            byte[] a = new byte[newArr.Length + 1];
+            newArr.CopyTo(a, 0);
+            a[newArr.Length] = ETX;
+            
+
+            //var control = tempb.Skip((int)searchEnd + 2).Take(2).ToArray();
+            
+
+            byte[] crcBytes = crc.ComputeChecksumBytes(a);
+            byte[] retBytes = new byte[inBytes.Length + 2];
+            inBytes.CopyTo(retBytes, 0);
+            retBytes[retBytes.Length - 2] = crcBytes[0];
+            retBytes[retBytes.Length - 1] = crcBytes[1];
+            return retBytes;
+        }
+        #endregion
         #region Основные обработки
         byte[] preparation(byte[] _byte)
         {
@@ -214,15 +349,17 @@ namespace FPIKS
             _out.Add(DLE);
             _out.Add(ETX);
             _out[_out.Count - 3] = getchecksum(_out); //считает контрольную сумму
-            for (int pos = 2; pos <= _out.Count - 3; pos++)
-            {
+            
+            for (int pos = 2; pos <= _out.Count - 5; pos++)
+            //for (int pos = 2; pos <= _out.Count - 3; pos++)
+                {
                 if (_out[pos] == DLE)
                 {
                     _out.Insert(pos + 1, DLE);
                     pos++;
                 }
             }
-            return _out.ToArray();
+            return returnArrayBytesWithCRC16(_out.ToArray());
         }
 
         byte[] serialPortReceivedData;
@@ -1246,7 +1383,7 @@ namespace FPIKS
             return InfoDate && InfoTime;
         }
 
-        public int GetNumZReport
+        public int? GetNumZReport
         {
             get
             {
@@ -3518,7 +3655,7 @@ namespace FPIKS
             Return.Add("BitStatus0", bitsStatus[0]); // принтер не готов    проверить принтер**
             if (bitsStatus[0]) StatusInfo = StatusInfo  + "принтер не готов    проверить принтер**;";
             Return.Add("BitStatus1", bitsStatus[1]); //превышение продолжительности хранения данных в КЛЕФ  проверить модем
-            if (bitsStatus[1]) StatusInfo = StatusInfo + "превышение продолжительности хранения данных в КЛЕФ  проверить модем;";
+            if (bitsStatus[1]) StatusInfo = StatusInfo + "ошибка модема, выключить/включить ЭККР,обратиться в сервис - центр; ";
             Return.Add("BitStatus2", bitsStatus[2]); //ошибка или переполнение фискальной памяти  обратиться в сервис-центр
             if (bitsStatus[2]) StatusInfo = StatusInfo + "ошибка или переполнение фискальной памяти  обратиться в сервис-центр;";
             Return.Add("BitStatus3", bitsStatus[3]); //неправильная дата или ошибка часов   обратиться в сервис-центр
@@ -3584,14 +3721,15 @@ namespace FPIKS
             else if (result == 37) ResultInfo = "открыт чек выплат, продажи запрещены";
             else if (result == 38) ResultInfo = "открыт чек продаж, выплаты запрещены";
             else if (result == 39) ResultInfo = "команда запрещена, чек не открыт";
+            else if (result == 40) ResultInfo = "переполнение памяти артикулов";
             else if (result == 41) ResultInfo = "команда запрещена до Z-отчета";
-            else if (result == 42) ResultInfo = "команда запрещена, не было чеков";
+            else if (result == 42) ResultInfo = "команда запрещена до фискализации";
             else if (result == 43) ResultInfo = "сдача с этой оплаты запрещена ";
             else if (result == 44) ResultInfo = "команда запрещена, чек открыт";
             else if (result == 45) ResultInfo = "скидки/наценки запрещены, не было продаж";
             else if (result == 46) ResultInfo = "команда запрещена после начала оплат";
-            else if (result == 47) ResultInfo = "переполнение контрольной ленты";
-            else if (result == 48) ResultInfo = "неправильный номер данных КЛЕФ";
+            else if (result == 47) ResultInfo = "превышение продолжительности отправки данных больше 72 часов";
+            else if (result == 48) ResultInfo = "нет ответа от модема";
             else if (result == 50) ResultInfo = "команда запрещена, КЛЕФ не пустой";
 
             if ((bitsStatus[0]
@@ -3633,9 +3771,9 @@ namespace FPIKS
                 Encoding cp866 = Encoding.GetEncoding(866); // кодировка, которая используется для конвертации байтов в строку.
                 int cur = 0;
 
-                BitArray _bit = new BitArray(rep.GetRange(cur, 2).ToArray());                
-              
+                BitArray _bit = new BitArray(rep.GetRange(cur, 2).ToArray());
 
+                Return.Add("UsedTaxes", Convert.ToBoolean(_bit[0]));
                 Return.Add("PayStatus", Convert.ToBoolean(_bit[1]));
                 Return.Add("BoxClosed", Convert.ToBoolean(_bit[2]));
                 Return.Add("CheckType", Convert.ToBoolean(_bit[3]));
@@ -3644,7 +3782,8 @@ namespace FPIKS
                 Return.Add("CheckOpened", Convert.ToBoolean(_bit[6]));
                 Return.Add("ControlDisplayOff", Convert.ToBoolean(_bit[7]));
                 Return.Add("ControlPrinted", Convert.ToBoolean(_bit[8]));
-                Return.Add("TaxChanging", Convert.ToBoolean(_bit[9]));
+                Return.Add("PrinteredLogo", Convert.ToBoolean(_bit[9]));
+                Return.Add("CutterBlocked", Convert.ToBoolean(_bit[9]));
                 Return.Add("ServReportPrintReceiptOnly", Convert.ToBoolean(_bit[11]));
                 Return.Add("WorkModeStatus", Convert.ToBoolean(_bit[12])); 
                 Return.Add("LastCommandStatus", Convert.ToBoolean(_bit[13]));
@@ -3673,7 +3812,8 @@ namespace FPIKS
             if (_day == 0) _day = 1;
             string hexmonth = rep[22].ToString("X");
             int _month = Convert.ToInt16(hexmonth);
-
+                _month = Math.Min(_month, 1);
+                _month = Math.Max(_month, 12);
             string hexyear = rep[23].ToString("X");
             int _year = Convert.ToInt16(hexyear);
 
@@ -3683,10 +3823,11 @@ namespace FPIKS
             string hexmin = rep[25].ToString("X");
             int _min = Convert.ToInt16(hexmin);
 
-            _RegistrationDate = new DateTime(2000 + _year, _month, _day, _hour, _min, 0);
+                _RegistrationDate = new DateTime(2000 + _year, _month, _day, _hour, _min, 0);
+                
 
-            
-            _FiscalNumber = cp866.GetString(rep.GetRange(26, 10).ToArray());
+
+                _FiscalNumber = cp866.GetString(rep.GetRange(26, 10).ToArray());
 
             
 

@@ -36,27 +36,45 @@ namespace TestConsole
             ////ics.FPNullCheck();
             if (connect)
             {
-                
-                ics.FPDayReport(0);
-                Dictionary<string, object> getinfo = ics.getDicInfo;
+                var info = ics.FPSetCashier(0, "Darth Vader", 0, false);
+                Console.WriteLine("Darth Vader:{0}", info);
 
-                Console.WriteLine(getinfo["Error"]);
+                info = ics.FPNullCheck();
+                Console.WriteLine("FPNullCheck:{0}", info);
+                info = ics.FPNullCheck();
+                Console.WriteLine("FPNullCheck:{0}", info);
+                info = ics.FPInToCash(5000);
+                Console.WriteLine("FPNullCheck:{0}", info);
+                info = ics.FPComment("far far away", true);
+                Console.WriteLine("FPComment:{0}", info);
+                info = ics.FPSaleEx(1, 0, true, 5000, 1, false, "0 - Lightsaber", "0");
+                Console.WriteLine("FPSaleEx:{0}", info);
+                info = ics.FPSaleEx(1, 0, true, 60000, 1, false, "1 - Armor", "1");
+                Console.WriteLine("FPSaleEx:{0}", info);
+                info = ics.FPComment("in a galaxy", true);
+                Console.WriteLine("FPSaleEx:{0}", info);
+                info = ics.FPPayment(3, 100000, true, true, "Star Wars");
+                Console.WriteLine("FPPayment:{0}", info);
+                //ics.FPDayReport(0);
+                //Dictionary<string, object> getinfo = ics.getDicInfo;
+
+                //Console.WriteLine(getinfo["Error"]);
 
                 //Dictionary<string, object> KlefMem = ics.getKlefInfo;
-            //    Dictionary<string, object> info = ics.getDicInfo;
-            //    //if (Convert.ToBoolean(info["SmenaOpened"]) && Convert.ToBoolean(info["BitStatus5"]) && Convert.ToByte(info["ByteStatus"]) == 32)
-            //    //{
+                //    Dictionary<string, object> info = ics.getDicInfo;
+                //    //if (Convert.ToBoolean(info["SmenaOpened"]) && Convert.ToBoolean(info["BitStatus5"]) && Convert.ToByte(info["ByteStatus"]) == 32)
+                //    //{
                 //Console.WriteLine(KlefMem["PacketFirst"]);
                 //Console.WriteLine(KlefMem["PacketLast"]);
                 //Console.WriteLine(KlefMem["FreeMem"]);
-            //    //}
-            //    //UInt16 tempt = ics.getBeginKLEF;
-            //    //UInt16 EndKlef = ics.getEndKLEF;
-            //    //bool i = ics.FPGetTaxRates;
-            //    //Console.WriteLine("Состояние обрезчика:{0}", ics.GetFPCplCutter);
-            //    //Console.WriteLine("Перевод обрезчика:{0}", ics.FPCplCutter());
-            //    //Console.WriteLine("Состояние обрезчика:{0}", ics.GetFPCplCutter);            
-            //    //Console.WriteLine("Перевод обрезчика:{0}", ics.FPCplCutter());            
+                //    //}
+                //    //UInt16 tempt = ics.getBeginKLEF;
+                //    //UInt16 EndKlef = ics.getEndKLEF;
+                //    //bool i = ics.FPGetTaxRates;
+                //    //Console.WriteLine("Состояние обрезчика:{0}", ics.GetFPCplCutter);
+                //    //Console.WriteLine("Перевод обрезчика:{0}", ics.FPCplCutter());
+                //    //Console.WriteLine("Состояние обрезчика:{0}", ics.GetFPCplCutter);            
+                //    //Console.WriteLine("Перевод обрезчика:{0}", ics.FPCplCutter());            
             }
             ics.FPClose();
 

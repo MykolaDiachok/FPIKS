@@ -2426,7 +2426,7 @@ namespace FPIKS
             else if (NalogGroup == 5)
                 _coding.Add(0x85);
 
-            byte[] strinfo = cp866.GetBytes(_GoodName.Substring(0, Math.Min(70, _GoodName.Length)));
+            byte[] strinfo = cp866.GetBytes(_GoodName.Substring(0, Math.Min(75, _GoodName.Length)));
             //длина названия товара или услуги (= n )
             //(n=255 –название взять из памяти)
             //BitArray len = new BitArray(new byte[] { (byte)strinfo.Length });
@@ -2483,13 +2483,16 @@ namespace FPIKS
                 //b_Payment[31] = true;
                 _Payment = _Payment ^ (1 << 31);
             _coding.AddRange(BitConverter.GetBytes(_Payment));
+            _coding.Add(0); //зарезервировано 
+            _coding.Add(0); //длина кода авторизации n
+            //_coding.Add(); //код авторизации при оплате картой через  платёжный терминал
 
 
             //byte[] strSend = preparation(_coding.ToArray());
 
 
             //bool ret = working(strSend);
-
+            //    10 02 c6 14 03 f4 01 00 00 00 00 2e 10 03 88 5f   ..Ж..ф........€_ 
             bool resultcommand;
             List<byte> rep = ReturnResult(out resultcommand, _coding, 240);
             rep = null; _coding = null; cp866 = null;
